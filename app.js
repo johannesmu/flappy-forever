@@ -29,28 +29,31 @@ createjs.Touch.enable(stage);
 
 ////////////////variables used in the game need to be declared here
 //so they can be shared/accessed by various functions in the game
-var mouseisdown = false;
+let mouseisdown = false;
 //create a reference for our timer
-var timer = createjs.Ticker;
+const timer = createjs.Ticker;
 //canvas dimensions
-var width;
-var height;
+let width;
+let height;
 //reference used to refer to the player
-var player;
-//
-var scale = 0.8;
-var isalive = true;
-var playerheight;
-var score = 0;
-var highscore = 0;
-var tween;
-var restart = false;
+let player;
+//number used to scale items in relation to screen size
+let scale = 0.8;
+//the state of the player
+let isalive = true;
+let playerheight;
+// initial score
+let score = 0;
+// hightscore if not played before
+let highscore = 0;
+let tween;
+let restart = false;
 
 //interval controls how often obstacles appear
 //in ticks, eg create an obstacle every x number of ticks
 //our game is running 60 ticks per second
 //250 is easy 150 is hard
-var interval = 250;
+var interval = 150;
 //how fast the obstacles move in pixels/tick
 var obspeed = 2;
 //an array to keep track of obstacles in the game, so
@@ -105,7 +108,7 @@ function initGame() {
 //function to reset the game
 function resetGame() {
     //set restart to true so we know the game is being restarted
-    if (setRestart("set") == "success") {
+    if (setRestart("set") == true) {
         //reload the page to reset game
         window.location.reload();
     }
@@ -115,16 +118,16 @@ function setRestart(command) {
     if (command == "set") {
         try {
             window.localStorage.setItem("timestamp", new Date().getTime());
-            return "success";
+            return true;
         } catch (err) {
-            return "error";
+            return false;
         }
     } else if (command == "get") {
         try {
             time = window.localStorage.getItem("timestamp");
             return time;
         } catch (err) {
-            return "error";
+            return false;
         }
     }
 }
@@ -166,7 +169,7 @@ function onKeyUp() {
 }
 
 function setupPlayer() {
-    var data = {
+    var data = {                                    
         images: ["assets/sprites/bird.png"],
         frames: {
             width: 200,
@@ -276,7 +279,7 @@ function manageObstacles() {
     //this function manages the creation
     //the movement and the removal of obstacles from the game environment
     //if the number of ticks is perfectly divisible by the value of interval
-    //eg 7%3=1 where 6%3=0 google:modulo
+    //eg 7%3=1 where 6%3=0 
     if (timer.getTicks() % interval == 0) {
         obstacle = createObstacle();
         obstacle.x = width + 1;
@@ -389,20 +392,10 @@ function readScore() {
 //animate background
 var bgposition = 0;
 function moveBackground(elm){
-    if (timer.getTicks() % 5 == 0) {
-        bgposition-=1;
+    if (timer.getTicks() % 3 == 0) {
+        bgposition-=2;
         var position=bgposition+"px 0px";
         document.getElementById(elm).style.backgroundPosition=position; 
     }
 }
-//cordova stuff for the android app
-document.addEventListener("deviceready", function () {
-    //listen to the back button on Android
-    document.addEventListener("back", onBack);
 
-    function onBack() {
-        //save the score then exit app
-        saveScore();
-        navigator.app.exitApp();
-    }
-});
